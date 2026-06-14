@@ -148,11 +148,8 @@ export default function Welcome() {
           marginBottom: '2.5rem',
         }}>
           <Dashboard />
-          {QUIZZES.map((q, i) => (
-            <QuizTile key={q.slug} quiz={q} index={i} />
-          ))}
 
-          {/* Explainer tile */}
+          {/* Explainer tile — first */}
           <Link to="/what-is-fire" style={{ textDecoration: 'none', gridColumn: 'span 1' }}>
             <motion.div
               initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}
@@ -185,6 +182,10 @@ export default function Welcome() {
               </div>
             </motion.div>
           </Link>
+
+          {QUIZZES.map((q, i) => (
+            <QuizTile key={q.slug} quiz={q} index={i + 1} />
+          ))}
         </div>
 
         {/* CTAs */}
