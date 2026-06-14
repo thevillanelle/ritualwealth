@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { useAuthStore } from '../stores/useAuthStore'
 import { supabase } from '../lib/supabase'
-import { FIRE_TYPE_META } from '../data/quizzes'
+import { FIRE_TYPE_META, deriveMilestones } from '../data/quizzes'
 
 function fmt(n) { return n != null ? '$' + Number(n).toLocaleString() : '—' }
 function fmtEur(n) { return n != null ? '€' + Number(n).toLocaleString() : '—' }
@@ -373,20 +373,33 @@ export default function Plan() {
     </div>
   )
 
-  const fireResult      = results['fire_type']?.result ?? {}
-  const fireAnswers     = results['fire_type']?.answers ?? {}
-  const careerAnswers   = results['career']?.answers ?? {}
-  const homeAnswers     = results['home']?.answers ?? {}
-  const creativeAnswers = results['creative']?.answers ?? {}
+  const fireResult       = results['fire_type']?.result ?? {}
+  const fireAnswers      = results['fire_type']?.answers ?? {}
+  const careerAnswers    = results['career']?.answers ?? {}
+  const homeAnswers      = results['home']?.answers ?? {}
+  const creativeAnswers  = results['creative']?.answers ?? {}
+  const trackAnswers     = results['career_tracks']?.answers ?? {}
+  const milestoneAnswers = results['milestones']?.answers ?? {}
 
-  const fire     = buildFireNarrative(fireResult, fireAnswers)
-  const career   = buildCareerNarrative(careerAnswers)
-  const home     = buildHomeNarrative(homeAnswers)
-  const creative = buildCreativeNarrative(creativeAnswers)
+  const fire      = buildFireNarrative(fireResult, fireAnswers)
+  const career    = buildCareerNarrative(careerAnswers)
+  const home      = buildHomeNarrative(homeAnswers)
+  const creative  = buildCreativeNarrative(creativeAnswers)
+  const milestones = Object.keys(milestoneAnswers).length > 0 ? deriveMilestones(milestoneAnswers) : null
+
+  const compLabels = {
+    under_80k: 'under $80k', '80_120k': '$80k–$120k', '120_150k': '$120k–$150k',
+    '150_200k': '$150k–$200k', over_200k: 'over $200k',
+  }
+  const timelineLabels = {
+    now: 'applying now', '3mo': '3 months', '6mo': '6 months',
+    '12mo': '12 months', over_12mo: '12+ months',
+  }
 
   const fireColor = FIRE_COLORS[fireResult.fire_type] ?? '#C8A86B'
-  const SLUGS     = ['fire_type', 'career', 'home', 'creative', 'risk']
-  const missing   = SLUGS.filter(s => !results[s])
+  const SLUGS     = ['fire_type', 'career', 'home', 'creative', 'risk', 'career_tracks', 'milestones']
+  const coreSLUGS = ['fire_type', 'career', 'home', 'creative', 'risk']
+  const missing   = coreSLUGS.filter(s => !results[s])
 
   return (
     <div className="page" style={{ minHeight: '100vh' }}>
@@ -444,45 +457,91 @@ export default function Plan() {
 
         {/* ── MILESTONE TIMELINE ───────────────────────────────────────── */}
         <PlanSection label="MILESTONE TIMELINE" color={fireColor}>
-          {[
-            { label: 'DEBT $0',              sub: '12 months',      note: 'Kill credit cards first. Non-negotiable.' },
-            { label: 'EMERGENCY FUND',        sub: '18 months',      note: '6 months of expenses. Then you invest.' },
-            { label: 'CHICAGO DOWN PAYMENT',  sub: '24–30 months',   note: '$100k saved. Lakeview 2/2.' },
-            { label: 'FIRST PROPERTY',        sub: '30 months',      note: '$500k full-service condo. First enclave.' },
-            { label: 'FRANCE',                sub: 'After Chicago',  note: 'Paris, Marseille, or Nice. €250k–€350k. Rinse and repeat.' },
-            { label: 'FAT FIRE',              sub: '10–12 years',    note: '$2M. Age 45. Done.' },
-          ].map((m, i) => (
-            <div key={i} style={{ display: 'flex', gap: '1.25rem', paddingBottom: '1.25rem', marginBottom: i < 5 ? '0' : '0', position: 'relative' }}>
-              {/* Line */}
-              {i < 5 && <div style={{ position: 'absolute', left: '7px', top: '20px', bottom: '-8px', width: '1px', background: '#1C2320' }} />}
-              {/* Dot */}
-              <div style={{ width: '15px', height: '15px', borderRadius: '50%', border: `2px solid ${fireColor}`, background: '#080705', flexShrink: 0, marginTop: '2px' }} />
-              <div style={{ flex: 1 }}>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.75rem', marginBottom: '0.2rem' }}>
-                  <p style={{ fontFamily: 'monospace', fontSize: '0.6rem', letterSpacing: '0.12em', color: fireColor }}>{m.label}</p>
-                  <p style={{ fontFamily: 'monospace', fontSize: '0.6rem', color: '#4A6A5A' }}>{m.sub}</p>
+          {milestones ? (
+            <>
+              {/* Dynamic — from milestones quiz */}
+              {[
+                milestones.debtFreeDate && {
+                  label: 'DEBT $0',
+                  sub:   milestones.debtFreeDate,
+                  note:  `${fmt(milestones.debt)} eliminated at ${fmt(milestones.debtPmt)}/month. First priority.`,
+                },
+                {
+                  label: 'EMERGENCY FUND',
+                  sub:   milestones.efDate,
+                  note:  `${fmt(Math.round(milestones.efTarget))} — ${milestones.efMonths} months of expenses. Then you invest.`,
+                },
+                milestones.dpDate && {
+                  label: 'DOWN PAYMENT',
+                  sub:   milestones.dpDate,
+                  note:  `${fmt(milestones.downPmt)} saved for a ${fmt(milestones.homePrice)} property.`,
+                },
+              ].filter(Boolean).map((m, i, arr) => (
+                <div key={i} style={{ display: 'flex', gap: '1.25rem', paddingBottom: '1.25rem', position: 'relative' }}>
+                  {i < arr.length - 1 && <div style={{ position: 'absolute', left: '7px', top: '20px', bottom: '-8px', width: '1px', background: '#1C2320' }} />}
+                  <div style={{ width: '15px', height: '15px', borderRadius: '50%', border: `2px solid ${fireColor}`, background: '#080705', flexShrink: 0, marginTop: '2px' }} />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.75rem', marginBottom: '0.2rem' }}>
+                      <p style={{ fontFamily: 'monospace', fontSize: '0.6rem', letterSpacing: '0.12em', color: fireColor }}>{m.label}</p>
+                      <p style={{ fontFamily: 'monospace', fontSize: '0.6rem', color: '#4A6A5A' }}>{m.sub}</p>
+                    </div>
+                    <p style={{ fontFamily: '"DM Sans", sans-serif', fontSize: '0.85rem', color: '#6A7A66', lineHeight: 1.5 }}>{m.note}</p>
+                  </div>
                 </div>
-                <p style={{ fontFamily: '"DM Sans", sans-serif', fontSize: '0.85rem', color: '#6A7A66', lineHeight: 1.5 }}>{m.note}</p>
+              ))}
+              <Rule />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                {[
+                  { label: 'MONTHLY INCOME',   value: fmt(milestones.income) },
+                  { label: 'MONTHLY EXPENSES',  value: fmt(milestones.expenses) },
+                  { label: 'CURRENT SURPLUS',   value: fmt(Math.round(milestones.surplus)) + '/mo' },
+                  { label: 'POST-DEBT SURPLUS', value: fmt(Math.round(milestones.postDebtSurplus)) + '/mo' },
+                ].map(s => (
+                  <div key={s.label} style={{ padding: '0.875rem', background: '#0A0905', borderRadius: '0.625rem', border: '1px solid #1A1C16' }}>
+                    <p style={{ fontFamily: 'monospace', fontSize: '0.5rem', letterSpacing: '0.1em', color: '#3A4A40', marginBottom: '0.3rem' }}>{s.label}</p>
+                    <p style={{ fontFamily: '"Playfair Display", serif', fontSize: '1rem', color: '#F0EDE8' }}>{s.value}</p>
+                  </div>
+                ))}
               </div>
+            </>
+          ) : (
+            /* Prompt to take milestones quiz */
+            <div>
+              <Prose>Complete the Milestone Timeline quiz to generate your personal dates — debt-free, emergency fund, down payment, and beyond.</Prose>
+              <Link to="/quiz/milestones" style={{ textDecoration: 'none' }}>
+                <button className="btn-primary" style={{ marginTop: '1rem' }}>Build my timeline →</button>
+              </Link>
             </div>
-          ))}
+          )}
+        </PlanSection>
 
-          <Rule />
-          <p style={{ fontFamily: 'monospace', fontSize: '0.55rem', letterSpacing: '0.12em', color: '#3A4A40', marginBottom: '0.75rem' }}>ACCELERATOR MATH</p>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+        {/* ── CAREER TRACKS ────────────────────────────────────────────── */}
+        {Object.keys(trackAnswers).length > 0 ? (
+          <PlanSection label="CAREER TRACKS" color="#A89BC4">
             {[
-              { label: 'CURRENT SURPLUS',     value: '$2,100/month' },
-              { label: 'WITH $120k+ COMP',    value: '+$1,500–$2,000/month' },
-              { label: 'WITH $20k SIDE INCOME', value: '+$1,500/month' },
-              { label: 'ACCELERATED SURPLUS', value: '$5,000–$6,000/month' },
-            ].map(s => (
-              <div key={s.label} style={{ padding: '0.875rem', background: '#0A0905', borderRadius: '0.625rem', border: '1px solid #1A1C16' }}>
-                <p style={{ fontFamily: 'monospace', fontSize: '0.5rem', letterSpacing: '0.1em', color: '#3A4A40', marginBottom: '0.3rem' }}>{s.label}</p>
-                <p style={{ fontFamily: '"Playfair Display", serif', fontSize: '1rem', color: '#F0EDE8' }}>{s.value}</p>
+              { name: trackAnswers.ct1, company: trackAnswers.ct2, comp: trackAnswers.ct3, timeline: trackAnswers.ct4, label: 'PRIMARY TRACK' },
+              trackAnswers.ct5 === 'yes' && { name: trackAnswers.ct6, comp: trackAnswers.ct7, label: 'SECONDARY TRACK' },
+              trackAnswers.ct8 && { name: trackAnswers.ct8, label: 'LONG-TERM TRACK' },
+            ].filter(Boolean).filter(t => t.name).map((track, i) => (
+              <div key={i} style={{ marginBottom: '1.25rem', paddingBottom: '1.25rem', borderBottom: i < 2 ? '1px solid #12140F' : 'none' }}>
+                <p style={{ fontFamily: 'monospace', fontSize: '0.5rem', letterSpacing: '0.15em', color: '#3A4A40', marginBottom: '0.5rem' }}>{track.label}</p>
+                <p style={{ fontFamily: '"Playfair Display", serif', fontSize: '1.25rem', color: '#A89BC4', marginBottom: '0.25rem' }}>{track.name}</p>
+                {track.company && <p style={{ fontFamily: '"DM Sans", sans-serif', fontSize: '0.85rem', color: '#6A7A66', marginBottom: '0.25rem' }}>{track.company}</p>}
+                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem', flexWrap: 'wrap' }}>
+                  {track.comp && <Tag color="#A89BC4">{compLabels[track.comp] ?? track.comp}</Tag>}
+                  {track.timeline && <Tag color="#A89BC4">{timelineLabels[track.timeline] ?? track.timeline}</Tag>}
+                </div>
               </div>
             ))}
-          </div>
-        </PlanSection>
+          </PlanSection>
+        ) : (
+          <PlanSection label="CAREER TRACKS" color="#A89BC4">
+            <Prose>Name the exact roles you are working toward — titles, companies, comp targets, and timelines.</Prose>
+            <Link to="/quiz/career_tracks" style={{ textDecoration: 'none' }}>
+              <button className="btn-primary" style={{ marginTop: '1rem' }}>Add my career tracks →</button>
+            </Link>
+          </PlanSection>
+        )}
 
         {/* ── DEBT PAYOFF ──────────────────────────────────────────────── */}
         <PlanSection label="DEBT PAYOFF CALCULATOR" color="#C4717A">
