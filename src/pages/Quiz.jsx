@@ -29,7 +29,10 @@ export default function Quiz() {
   const progress = ((step) / total) * 100
 
   const answer = answers[q.id]
-  const canAdvance = answer !== undefined && (Array.isArray(answer) ? answer.length > 0 : true)
+  const isOptional = q.optional === true
+  const canAdvance = isOptional
+    ? true
+    : answer !== undefined && (Array.isArray(answer) ? answer.length > 0 : String(answer).trim() !== '')
 
   const select = (value) => {
     if (q.type === 'multi') {
@@ -149,23 +152,64 @@ export default function Quiz() {
               {q.question}
             </h2>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-              {q.options.map(opt => {
-                const isSelected = q.type === 'multi'
-                  ? (answers[q.id] ?? []).includes(opt.value)
-                  : answers[q.id] === opt.value
-                return (
-                  <button key={opt.value}
-                    className={`option-btn ${isSelected ? 'selected' : ''}`}
-                    onClick={() => select(opt.value)}>
-                    <span style={{ color: isSelected ? quiz.color : 'inherit' }}>
-                      {isSelected ? '✦ ' : '○ '}
-                    </span>
-                    {opt.label}
-                  </button>
-                )
-              })}
-            </div>
+            {(q.type === 'text' || q.type === 'currency') && (
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  {q.type === 'currency' && (
+                    <span style={{ fontFamily: '"Playfair Display", serif', fontSize: '1.5rem', color: '#4A6A5A' }}>$</span>
+                  )}
+                  <input
+                    type={q.type === 'currency' ? 'number' : 'text'}
+                    placeholder={q.placeholder ?? ''}
+                    value={answers[q.id] ?? ''}
+                    onChange={e => setAnswers(prev => ({ ...prev, [q.id]: e.target.value }))}
+                    autoFocus
+                    style={{
+                      flex: 1,
+                      background: 'transparent',
+                      border: 'none',
+                      borderBottom: `1px solid ${quiz.color}44`,
+                      padding: '0.75rem 0',
+                      color: '#F0EDE8',
+                      fontFamily: q.type === 'currency' ? '"Playfair Display", serif' : '"DM Sans", sans-serif',
+                      fontSize: q.type === 'currency' ? '2rem' : '1.1rem',
+                      outline: 'none',
+                      width: '100%',
+                    }}
+                  />
+                </div>
+                {q.hint && (
+                  <p style={{ fontFamily: 'monospace', fontSize: '0.6rem', color: '#4A6A5A', marginTop: '0.75rem', letterSpacing: '0.08em' }}>
+                    {q.hint}
+                  </p>
+                )}
+                {q.optional && (
+                  <p style={{ fontFamily: 'monospace', fontSize: '0.6rem', color: '#3A4A40', marginTop: '0.5rem', letterSpacing: '0.08em' }}>
+                    optional — press Next to skip
+                  </p>
+                )}
+              </div>
+            )}
+
+            {(q.type === 'single' || q.type === 'multi') && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                {q.options.map(opt => {
+                  const isSelected = q.type === 'multi'
+                    ? (answers[q.id] ?? []).includes(opt.value)
+                    : answers[q.id] === opt.value
+                  return (
+                    <button key={opt.value}
+                      className={`option-btn ${isSelected ? 'selected' : ''}`}
+                      onClick={() => select(opt.value)}>
+                      <span style={{ color: isSelected ? quiz.color : 'inherit' }}>
+                        {isSelected ? '✦ ' : '○ '}
+                      </span>
+                      {opt.label}
+                    </button>
+                  )
+                })}
+              </div>
+            )}
 
             {q.type === 'multi' && (
               <p style={{ fontFamily: 'monospace', fontSize: '0.6rem', color: '#4A6A5A', marginTop: '0.75rem', letterSpacing: '0.1em' }}>
