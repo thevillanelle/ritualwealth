@@ -11,7 +11,7 @@ const TILE_META = {
     sub:      'Lean, Fat, Barista, Coast — find your number.',
     bg:       'linear-gradient(135deg, #1C1A12 0%, #2A2210 100%)',
     accent:   '#C8A86B',
-    size:     'large',
+    size:     'small',
   },
   career: {
     headline: 'Career path',
@@ -45,10 +45,8 @@ const TILE_META = {
 
 function QuizTile({ quiz, index }) {
   const meta = TILE_META[quiz.slug]
-  const isLarge = meta.size === 'large'
-
   return (
-    <Link to={`/quiz/${quiz.slug}`} style={{ textDecoration: 'none', gridColumn: isLarge ? 'span 2' : 'span 1' }}>
+    <Link to={`/quiz/${quiz.slug}`} style={{ textDecoration: 'none' }}>
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
@@ -58,8 +56,8 @@ function QuizTile({ quiz, index }) {
           background: meta.bg,
           border: `1px solid ${meta.accent}22`,
           borderRadius: '1.25rem',
-          padding: isLarge ? '2.5rem' : '1.75rem',
-          minHeight: isLarge ? '220px' : '160px',
+          padding: '1.75rem',
+          minHeight: '160px',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
@@ -69,7 +67,7 @@ function QuizTile({ quiz, index }) {
         }}
       >
         {/* Number */}
-        <p style={{ fontFamily: 'monospace', fontSize: '0.6rem', letterSpacing: '0.2em', color: meta.accent, marginBottom: isLarge ? '2rem' : '1rem' }}>
+        <p style={{ fontFamily: 'monospace', fontSize: '0.6rem', letterSpacing: '0.2em', color: meta.accent, marginBottom: '1rem' }}>
           0{index + 1}
         </p>
 
@@ -77,7 +75,7 @@ function QuizTile({ quiz, index }) {
         <div>
           <h2 style={{
             fontFamily: '"Playfair Display", Georgia, serif',
-            fontSize: isLarge ? 'clamp(22px,3vw,32px)' : 'clamp(16px,2vw,20px)',
+            fontSize: 'clamp(16px,2vw,20px)',
             fontWeight: 400,
             color: '#F0EDE8',
             lineHeight: 1.2,
