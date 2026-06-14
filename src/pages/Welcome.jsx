@@ -151,6 +151,40 @@ export default function Welcome() {
           {QUIZZES.map((q, i) => (
             <QuizTile key={q.slug} quiz={q} index={i} />
           ))}
+
+          {/* Explainer tile */}
+          <Link to="/what-is-fire" style={{ textDecoration: 'none', gridColumn: 'span 1' }}>
+            <motion.div
+              initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}
+              whileHover={{ scale: 1.015 }}
+              style={{
+                background: 'linear-gradient(135deg, #0E0C0A 0%, #1A1410 100%)',
+                border: '1px solid #C8A86B22',
+                borderRadius: '1.25rem',
+                padding: '1.75rem',
+                minHeight: '160px',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                cursor: 'pointer',
+                position: 'relative',
+                overflow: 'hidden',
+              }}
+            >
+              <p style={{ fontFamily: 'monospace', fontSize: '0.6rem', letterSpacing: '0.2em', color: '#C8A86B' }}>THE GUIDE</p>
+              <div>
+                <h2 style={{ fontFamily: '"Playfair Display", Georgia, serif', fontSize: 'clamp(16px,2vw,20px)', fontWeight: 400, color: '#F0EDE8', lineHeight: 1.2, marginBottom: '0.5rem' }}>
+                  New to FIRE?
+                </h2>
+                <p style={{ fontFamily: '"DM Sans", sans-serif', fontSize: '0.8rem', color: '#8A9E96', lineHeight: 1.5 }}>
+                  Read the guide before you quiz.
+                </p>
+              </div>
+              <div style={{ position: 'absolute', bottom: '1.5rem', right: '1.5rem', width: '32px', height: '32px', borderRadius: '50%', border: '1px solid #C8A86B44', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span style={{ color: '#C8A86B', fontSize: '0.85rem' }}>→</span>
+              </div>
+            </motion.div>
+          </Link>
         </div>
 
         {/* CTAs */}
