@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { useAuthStore } from '../stores/useAuthStore'
 import { QUIZZES } from '../data/quizzes'
+import Dashboard from './Dashboard'
 
 const ATELIER_URL = import.meta.env.VITE_ATELIER_URL ?? 'https://atelier.ritualware.app'
 
@@ -146,6 +147,7 @@ export default function Welcome() {
           gap: '0.75rem',
           marginBottom: '2.5rem',
         }}>
+          <Dashboard />
           {QUIZZES.map((q, i) => (
             <QuizTile key={q.slug} quiz={q} index={i} />
           ))}
