@@ -74,6 +74,20 @@ export default function Quiz() {
         })
       }
 
+      // Points + badges
+      await supabase.rpc('add_points', { p_points: 10, p_reason: 'quiz_completed' })
+      await supabase.rpc('award_badge', { p_badge_slug: 'quiz_taker', p_context: { quiz_slug: slug } })
+      // Award fire_mapped if all 5 quizzes done
+      const { data: allResults } = await supabase
+        .from('fire_quiz_results')
+        .select('quiz_slug')
+        .eq('user_id', user.id)
+      const completedSlugs = new Set((allResults || []).map(r => r.quiz_slug))
+      if (['fire_type','career','home','creative','risk'].every(s => completedSlugs.has(s))) {
+        await supabase.rpc('award_badge', { p_badge_slug: 'fire_mapped' })
+        await supabase.rpc('add_points', { p_points: 40, p_reason: 'milestone' })
+      }
+
       // Activity feed
       await supabase.from('activity_feed').insert({
         user_id: user.id,
