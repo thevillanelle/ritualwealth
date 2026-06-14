@@ -5,7 +5,7 @@ import { useAuthStore } from '../stores/useAuthStore'
 import { supabase } from '../lib/supabase'
 import { FIRE_TYPE_META, RISK_META } from '../data/quizzes'
 
-const ATELIER_URL = import.meta.env.VITE_ATELIER_URL ?? 'https://atelier.ritualware.app'
+const ATELIER_URL = import.meta.env.VITE_ATELIER_URL ?? 'https://studio.ritualware.app'
 
 const SLUGS = ['fire_type', 'career', 'home', 'creative', 'risk']
 
@@ -43,19 +43,7 @@ export default function Dashboard() {
       })
   }, [user])
 
-  if (!user) return null
-
-  if (loading) return (
-    <div style={{ gridColumn: 'span 2', padding: '1.5rem', background: '#1A1710', borderRadius: '1.25rem', border: '1px solid #2a2a1a', color: '#4A6A5A', fontFamily: 'monospace', fontSize: '0.6rem', letterSpacing: '0.1em' }}>
-      loading your plan…
-    </div>
-  )
-
-  if (Object.keys(results).length === 0) return (
-    <div style={{ gridColumn: 'span 2', padding: '1.5rem', background: '#1A1710', borderRadius: '1.25rem', border: '1px solid #3a1a1a', color: '#8A4A4A', fontFamily: 'monospace', fontSize: '0.6rem', letterSpacing: '0.1em' }}>
-      signed in · no quiz results found · uid: {user.id}
-    </div>
-  )
+  if (!user || loading) return null
 
   const fireResult  = results['fire_type']?.result ?? {}
   const riskResult  = results['risk']?.result ?? {}

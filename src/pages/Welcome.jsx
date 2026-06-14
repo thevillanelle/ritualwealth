@@ -4,7 +4,7 @@ import { useAuthStore } from '../stores/useAuthStore'
 import { QUIZZES } from '../data/quizzes'
 import Dashboard from './Dashboard'
 
-const ATELIER_URL = import.meta.env.VITE_ATELIER_URL ?? 'https://atelier.ritualware.app'
+const ATELIER_URL = import.meta.env.VITE_ATELIER_URL ?? 'https://studio.ritualware.app'
 
 const TILE_META = {
   fire_type: {
