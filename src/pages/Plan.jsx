@@ -349,7 +349,7 @@ function buildRiskNarrative(result, a) {
     over_50:   'over 50% — sprinting',
   }[a?.r8] ?? null
 
-  return { meta, marketDropNarrative, debtNarrative, horizonNarrative, investmentVehicles, savingsRate }
+  return { marketDropNarrative, debtNarrative, horizonNarrative, investmentVehicles, savingsRate }
 }
 
 // ── UI Components ──────────────────────────────────────────────────────────
@@ -592,18 +592,13 @@ export default function Plan() {
         {/* ── INVESTMENT PROFILE ───────────────────────────────────────────── */}
         {risk && (
           <PlanSection label="INVESTMENT PROFILE" color="#6AAD8A">
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '0.5rem' }}>
-              <BigStat value={risk.meta.label} sub="RISK PROFILE" color="#6AAD8A" />
-              <BigStat value={risk.meta.allocation} sub="ALLOCATION" />
-            </div>
-            <Rule />
             {risk.horizonNarrative && <Prose>{risk.horizonNarrative}</Prose>}
             {risk.marketDropNarrative && <Prose>{risk.marketDropNarrative}</Prose>}
             {risk.debtNarrative && <Prose>{risk.debtNarrative}</Prose>}
             {risk.savingsRate && <Prose>Current savings rate: {risk.savingsRate} of take-home pay.</Prose>}
             {risk.investmentVehicles.length > 0 && (
               <>
-                <p style={{ fontFamily: 'monospace', fontSize: '0.55rem', letterSpacing: '0.12em', color: '#3A4A40', marginBottom: '0.75rem', marginTop: '1rem' }}>WHERE YOU INVEST</p>
+                <p style={{ fontFamily: 'monospace', fontSize: '0.55rem', letterSpacing: '0.12em', color: '#3A4A40', marginBottom: '0.75rem', marginTop: '1rem' }}>WHERE YOU WANT TO INVEST</p>
                 <div>{risk.investmentVehicles.map(v => <Tag key={v} color="#6AAD8A">{v}</Tag>)}</div>
               </>
             )}
