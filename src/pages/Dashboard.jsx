@@ -38,16 +38,7 @@ export default function Dashboard() {
       })
   }, [user])
 
-  if (!user) return (
-    <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ textAlign: 'center' }}>
-        <p style={{ fontFamily: '"Playfair Display", serif', fontSize: '1.25rem', color: '#F0EDE8', marginBottom: '1.5rem' }}>Sign in to see your plan.</p>
-        <button className="btn-primary" onClick={signInWithGoogle}>Sign in with Google</button>
-      </div>
-    </div>
-  )
-
-  if (loading) return null
+  if (!user || loading) return null
 
   const fireResult  = results['fire_type']?.result ?? {}
   const riskResult  = results['risk']?.result ?? {}
