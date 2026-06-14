@@ -24,7 +24,7 @@ const TYPES = [
     name: 'Barista FIRE',
     color: '#C4717A',
     number: '$300k–$700k',
-    desc: 'Semi-retired. You've saved enough that a part-time job or passion project covers your living expenses — so your investments can keep growing untouched. The vibe: coffee shop shifts, creative work, freedom with a safety net.',
+    desc: "Semi-retired. You've saved enough that a part-time job or passion project covers your living expenses — so your investments can keep growing untouched. The vibe: coffee shop shifts, creative work, freedom with a safety net.",
   },
   {
     name: 'Coast FIRE',
