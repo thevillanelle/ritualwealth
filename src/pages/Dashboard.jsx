@@ -43,7 +43,19 @@ export default function Dashboard() {
       })
   }, [user])
 
-  if (!user || loading) return null
+  if (!user) return null
+
+  if (loading) return (
+    <div style={{ gridColumn: 'span 2', padding: '1.5rem', background: '#1A1710', borderRadius: '1.25rem', border: '1px solid #2a2a1a', color: '#4A6A5A', fontFamily: 'monospace', fontSize: '0.6rem', letterSpacing: '0.1em' }}>
+      loading your plan…
+    </div>
+  )
+
+  if (Object.keys(results).length === 0) return (
+    <div style={{ gridColumn: 'span 2', padding: '1.5rem', background: '#1A1710', borderRadius: '1.25rem', border: '1px solid #3a1a1a', color: '#8A4A4A', fontFamily: 'monospace', fontSize: '0.6rem', letterSpacing: '0.1em' }}>
+      signed in · no quiz results found · uid: {user.id}
+    </div>
+  )
 
   const fireResult  = results['fire_type']?.result ?? {}
   const riskResult  = results['risk']?.result ?? {}
