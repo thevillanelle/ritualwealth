@@ -132,9 +132,10 @@ export default function Quiz() {
         <span style={{ fontFamily: 'monospace', fontSize: '0.65rem', color: '#4A6A5A', letterSpacing: '0.15em' }}>
           {step + 1} / {total}
         </span>
-        <span style={{ fontFamily: 'monospace', fontSize: '0.65rem', letterSpacing: '0.1em', color: quiz.color }}>
-          {quiz.slug.replace('_', ' ')}
-        </span>
+        <button onClick={() => navigate('/')}
+          style={{ fontFamily: 'monospace', fontSize: '0.65rem', letterSpacing: '0.1em', color: '#3a3028', background: 'none', border: 'none', cursor: 'pointer' }}>
+          ✕ exit
+        </button>
       </div>
 
       {/* Question */}
