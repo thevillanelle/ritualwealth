@@ -88,11 +88,11 @@ export default function Dashboard() {
             )}
           </h2>
         </div>
-        <a href={ATELIER_URL} style={{ textDecoration: 'none', flexShrink: 0 }}>
+        <Link to="/plan" style={{ textDecoration: 'none', flexShrink: 0 }}>
           <button className="btn-ghost" style={{ fontSize: '0.75rem', padding: '0.5rem 1rem' }}>
-            Open m'atelier →
+            View full plan →
           </button>
-        </a>
+        </Link>
       </div>
 
       {/* Stats row */}
