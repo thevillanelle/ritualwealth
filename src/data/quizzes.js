@@ -525,7 +525,227 @@ export const QUIZZES = [
       },
     ],
   },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // 6. CAREER TRACKS
+  // ─────────────────────────────────────────────────────────────────────────
+  {
+    slug: 'career_tracks',
+    title: 'What are your specific career tracks?',
+    subtitle: 'Name the exact roles you are working toward. Be specific.',
+    color: '#A89BC4',
+    questions: [
+      {
+        id: 'ct1',
+        question: 'What is your primary career track? Give it a name.',
+        type: 'text',
+        placeholder: 'e.g. Internal Tools Architect, Field Leader, French Fintech Compliance',
+        hint: 'The role you are most actively pursuing right now.',
+      },
+      {
+        id: 'ct2',
+        question: 'What company or type of company is this role at?',
+        type: 'text',
+        placeholder: 'e.g. Apple, mid-size fintech, my own company',
+      },
+      {
+        id: 'ct3',
+        question: 'What is the target comp for this track?',
+        type: 'single',
+        options: [
+          { value: 'under_80k',   label: 'Under $80,000' },
+          { value: '80_120k',     label: '$80,000–$120,000' },
+          { value: '120_150k',    label: '$120,000–$150,000' },
+          { value: '150_200k',    label: '$150,000–$200,000' },
+          { value: 'over_200k',   label: 'Over $200,000' },
+        ],
+      },
+      {
+        id: 'ct4',
+        question: 'How soon could you realistically land this role?',
+        type: 'single',
+        options: [
+          { value: 'now',        label: 'I am applying now' },
+          { value: '3mo',        label: '3 months' },
+          { value: '6mo',        label: '6 months' },
+          { value: '12mo',       label: '12 months' },
+          { value: 'over_12mo',  label: 'More than a year out' },
+        ],
+      },
+      {
+        id: 'ct5',
+        question: 'Do you have a secondary track you are also pursuing?',
+        type: 'single',
+        options: [
+          { value: 'yes', label: 'Yes — I have a backup or parallel track' },
+          { value: 'no',  label: 'No — I am going all in on one path' },
+        ],
+      },
+      {
+        id: 'ct6',
+        question: 'Name your secondary track.',
+        type: 'text',
+        placeholder: 'e.g. Field Leader — Apple New Store Openings',
+        optional: true,
+        showIf: { id: 'ct5', value: 'yes' },
+      },
+      {
+        id: 'ct7',
+        question: 'Target comp for your secondary track?',
+        type: 'single',
+        optional: true,
+        showIf: { id: 'ct5', value: 'yes' },
+        options: [
+          { value: 'under_80k',  label: 'Under $80,000' },
+          { value: '80_120k',    label: '$80,000–$120,000' },
+          { value: '120_150k',   label: '$120,000–$150,000' },
+          { value: '150_200k',   label: '$150,000–$200,000' },
+          { value: 'over_200k',  label: 'Over $200,000' },
+        ],
+      },
+      {
+        id: 'ct8',
+        question: 'Is there a third track — something international, entrepreneurial, or longer-term?',
+        type: 'text',
+        placeholder: 'e.g. French fintech compliance role, or leave blank',
+        optional: true,
+      },
+    ],
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // 7. MILESTONE TIMELINE
+  // ─────────────────────────────────────────────────────────────────────────
+  {
+    slug: 'milestones',
+    title: 'Build your milestone timeline.',
+    subtitle: 'Real numbers. Real dates. Your actual plan.',
+    color: '#C8A86B',
+    questions: [
+      {
+        id: 'ms1',
+        question: 'What is your monthly take-home pay right now?',
+        type: 'currency',
+        placeholder: '0',
+        hint: 'After taxes. What actually hits your account.',
+      },
+      {
+        id: 'ms2',
+        question: 'What are your monthly essential expenses?',
+        type: 'currency',
+        placeholder: '0',
+        hint: 'Rent, food, transport, utilities, subscriptions. Not debt payments.',
+      },
+      {
+        id: 'ms3',
+        question: 'What is your total current debt?',
+        type: 'currency',
+        placeholder: '0',
+        hint: 'Credit cards, personal loans, student debt. Not mortgage.',
+      },
+      {
+        id: 'ms4',
+        question: 'What is your current monthly debt payment?',
+        type: 'currency',
+        placeholder: '0',
+        hint: 'What you are paying toward debt each month right now.',
+      },
+      {
+        id: 'ms5',
+        question: 'What are your current liquid savings?',
+        type: 'currency',
+        placeholder: '0',
+        hint: 'Cash and easily accessible investments. Not retirement accounts.',
+      },
+      {
+        id: 'ms6',
+        question: 'How many months of expenses do you want in your emergency fund?',
+        type: 'single',
+        options: [
+          { value: '3',  label: '3 months' },
+          { value: '6',  label: '6 months' },
+          { value: '9',  label: '9 months' },
+          { value: '12', label: '12 months' },
+        ],
+      },
+      {
+        id: 'ms7',
+        question: 'What is your first home purchase target price?',
+        type: 'currency',
+        placeholder: '0',
+        hint: 'Your best estimate. You can adjust this later.',
+      },
+      {
+        id: 'ms8',
+        question: 'How much are you targeting for a down payment?',
+        type: 'currency',
+        placeholder: '0',
+        hint: 'Typically 10–20% of the purchase price.',
+      },
+    ],
+  },
 ]
+
+// ── Milestone timeline derivation ──────────────────────────────────────────
+
+export function deriveMilestones(answers) {
+  const income    = parseFloat(answers.ms1) || 0
+  const expenses  = parseFloat(answers.ms2) || 0
+  const debt      = parseFloat(answers.ms3) || 0
+  const debtPmt   = parseFloat(answers.ms4) || 0
+  const savings   = parseFloat(answers.ms5) || 0
+  const efMonths  = parseInt(answers.ms6)   || 6
+  const homePrice = parseFloat(answers.ms7) || 0
+  const downPmt   = parseFloat(answers.ms8) || 0
+
+  const surplus    = income - expenses - debtPmt
+  // Use explicitly stated EF target if provided, otherwise derive from expenses
+  const efTarget   = parseFloat(answers.ms6_target) || (expenses * efMonths)
+
+  // Months to debt-free — throw full surplus + minimum payment at debt
+  const totalDebtPayment = surplus + debtPmt
+  let debtFreeMonths = 0
+  if (debt > 0 && totalDebtPayment > 0) {
+    debtFreeMonths = Math.ceil(debt / totalDebtPayment)
+  }
+
+  // After debt-free, full surplus goes to savings
+  const postDebtSurplus = surplus + debtPmt
+
+  // Months to emergency fund (starting from savings, after debt done)
+  let efSavings = savings
+  let efMonthsNeeded = 0
+  if (efSavings < efTarget) {
+    efMonthsNeeded = debtFreeMonths + Math.ceil((efTarget - efSavings) / postDebtSurplus)
+  } else {
+    efMonthsNeeded = debtFreeMonths
+  }
+
+  // Months to down payment (after emergency fund)
+  let dpMonthsNeeded = 0
+  if (downPmt > 0) {
+    dpMonthsNeeded = efMonthsNeeded + Math.ceil(downPmt / postDebtSurplus)
+  }
+
+  function addMonths(months) {
+    const d = new Date()
+    d.setMonth(d.getMonth() + Math.round(months))
+    return d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+  }
+
+  return {
+    surplus,
+    postDebtSurplus,
+    debtFreeMonths,
+    debtFreeDate:  debt > 0 ? addMonths(debtFreeMonths) : null,
+    efTarget,
+    efMonthsNeeded,
+    efDate:        addMonths(efMonthsNeeded),
+    dpMonthsNeeded,
+    dpDate:        downPmt > 0 ? addMonths(dpMonthsNeeded) : null,
+    income, expenses, debt, debtPmt, savings, homePrice, downPmt, efMonths,
+  }
+}
 
 // ─── Result derivation ─────────────────────────────────────────────────────
 
