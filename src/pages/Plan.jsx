@@ -543,12 +543,6 @@ export default function Plan() {
           </PlanSection>
         )}
 
-        {/* ── DEBT PAYOFF ──────────────────────────────────────────────── */}
-        <PlanSection label="DEBT PAYOFF CALCULATOR" color="#C4717A">
-          <Prose>Enter your current debt, monthly payment, and interest rate to see your payoff timeline.</Prose>
-          <DebtPayoffTool fireColor="#C4717A" />
-        </PlanSection>
-
         {/* ── CAREER TRACKS ────────────────────────────────────────────── */}
         {career && (
           <PlanSection label="CAREER PATH" color="#A89BC4">

@@ -7,6 +7,7 @@ import Results      from './pages/Results'
 import Plan         from './pages/Plan'
 import AuthCallback from './pages/AuthCallback'
 import WhatIsFire  from './pages/WhatIsFire'
+import DebtPayoff  from './pages/DebtPayoff'
 
 export default function App() {
   const { initialize } = useAuthStore()
@@ -20,6 +21,7 @@ export default function App() {
         <Route path="/results/:slug"       element={<Results />} />
         <Route path="/plan"                element={<Plan />} />
         <Route path="/what-is-fire"        element={<WhatIsFire />} />
+        <Route path="/tools/debt"          element={<DebtPayoff />} />
         <Route path="/auth/callback"       element={<AuthCallback />} />
       </Routes>
     </BrowserRouter>

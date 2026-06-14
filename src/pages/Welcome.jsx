@@ -35,19 +35,38 @@ const TILE_META = {
     accent:   '#C4717A',
     size:     'small',
   },
-  risk: {
-    headline: 'Risk tolerance',
-    sub:      'How you invest once you have something to invest.',
-    bg:       'linear-gradient(135deg, #121618 0%, #0E1E2A 100%)',
-    accent:   '#7AB4C8',
+  debt_payoff: {
+    headline: 'Debt payoff',
+    sub:      'Enter your balance and see the exact date you're out.',
+    bg:       'linear-gradient(135deg, #1C1214 0%, #2A0E14 100%)',
+    accent:   '#C4717A',
+    size:     'small',
+  },
+  career_tracks: {
+    headline: 'Career tracks',
+    sub:      'Name the exact roles you are working toward.',
+    bg:       'linear-gradient(135deg, #14121C 0%, #1C1028 100%)',
+    accent:   '#A89BC4',
+    size:     'small',
+  },
+  milestones: {
+    headline: 'Milestone timeline',
+    sub:      'Real numbers. Real dates. Your actual plan.',
+    bg:       'linear-gradient(135deg, #1C1A12 0%, #2A2210 100%)',
+    accent:   '#C8A86B',
     size:     'small',
   },
 }
 
+const TILE_ROUTES = {
+  debt_payoff: '/tools/debt',
+}
+
 function QuizTile({ quiz, index }) {
   const meta = TILE_META[quiz.slug]
+  const to   = TILE_ROUTES[quiz.slug] ?? `/quiz/${quiz.slug}`
   return (
-    <Link to={`/quiz/${quiz.slug}`} style={{ textDecoration: 'none' }}>
+    <Link to={to} style={{ textDecoration: 'none' }}>
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
@@ -186,6 +205,7 @@ export default function Welcome() {
           {QUIZZES.map((q, i) => (
             <QuizTile key={q.slug} quiz={q} index={i + 1} />
           ))}
+          <QuizTile quiz={{ slug: 'debt_payoff' }} index={QUIZZES.length + 1} />
         </div>
 
         {/* CTAs */}
