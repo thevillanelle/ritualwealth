@@ -73,6 +73,20 @@ export default function Quiz() {
           updated_at: new Date().toISOString(),
         })
       }
+
+      // Activity feed
+      await supabase.from('activity_feed').insert({
+        user_id: user.id,
+        actor_name: user.user_metadata?.full_name || user.email,
+        event_type: 'quiz_completed',
+        payload: {
+          quiz_slug: slug,
+          quiz_name: quiz.title,
+          ...(result.fire_type ? { fire_type: result.fire_type } : {}),
+          ...(result.risk_profile ? { risk_profile: result.risk_profile } : {}),
+        },
+        visibility: 'friends',
+      })
     }
 
     setSaving(false)
