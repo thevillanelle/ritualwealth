@@ -30,7 +30,7 @@ const TYPES = [
     name: 'Coast FIRE',
     color: '#A89BC4',
     number: 'Varies',
-    desc: 'You've invested enough early that compound interest will get you to your number by traditional retirement age — without another dollar contributed. You stop saving aggressively and just live. Coast.',
+    desc: "You've invested enough early that compound interest will get you to your number by traditional retirement age — without another dollar contributed. You stop saving aggressively and just live. Coast.",
   },
 ]
 
