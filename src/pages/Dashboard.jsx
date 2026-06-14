@@ -30,10 +30,15 @@ export default function Dashboard() {
       .select('*')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
-      .then(({ data }) => {
+      .then(({ data, error }) => {
+        if (error) console.error('fire_quiz_results fetch error:', error)
         const latest = {}
         ;(data ?? []).forEach(r => { if (!latest[r.quiz_slug]) latest[r.quiz_slug] = r })
         setResults(latest)
+        setLoading(false)
+      })
+      .catch(err => {
+        console.error('Dashboard fetch failed:', err)
         setLoading(false)
       })
   }, [user])
