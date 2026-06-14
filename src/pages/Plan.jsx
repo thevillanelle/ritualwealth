@@ -15,100 +15,203 @@ const FIRE_COLORS = {
   coast_fire:   '#A89BC4',
 }
 
-const CAREER_LABELS = {
-  under_100k: 'Under $100k',
-  '100_150k': '$100k–$150k',
-  '150_200k': '$150k–$200k',
-  over_200k: 'Over $200k',
-  variable: 'Variable / equity',
+// ── Synthesis functions ────────────────────────────────────────────────────
+
+function synthesizeCareer(a) {
+  if (!a || !Object.keys(a).length) return null
+  const direction = {
+    same_more: 'staying in your lane and earning more',
+    pivot: 'a full career pivot',
+    build: 'building something of your own',
+    international: 'moving into an international market',
+    portfolio: 'building a portfolio of income streams',
+  }[a.c3] ?? 'charting your own path'
+
+  const target = {
+    under_100k: 'under $100k',
+    '100_150k': '$100k–$150k',
+    '150_200k': '$150k–$200k',
+    over_200k: 'over $200k',
+    variable: 'variable — equity and creative income',
+  }[a.c8] ?? 'your target range'
+
+  const assets = Array.isArray(a.c7)
+    ? a.c7.map(s => s.replace(/_/g, ' ')).join(', ')
+    : (a.c7 ?? '').replace(/_/g, ' ')
+
+  const leadership = {
+    love: 'You lead well and want to keep doing it.',
+    open: "You're open to leadership if the comp justifies it.",
+    prefer_ic: 'You perform best as an individual contributor.',
+    own_team: "You're not here to manage inside a corporation — you want to build your own team.",
+  }[a.c6] ?? ''
+
+  const relocation = {
+    yes_anywhere: "You're open to moving anywhere.",
+    yes_us: "You'd consider relocating within the US.",
+    yes_international: "You're actively drawn to international markets.",
+    no: "You're staying put — the plan works where you are.",
+  }[a.c5] ?? ''
+
+  return { direction, target, assets, leadership, relocation }
 }
 
-const HOME_LOCATION_LABELS = {
-  current_city: 'My current city',
-  different_us: 'Different US city',
-  international: 'International',
-  multi: 'Multiple places',
-  unsure: 'TBD',
+function synthesizeHome(a) {
+  if (!a || !Object.keys(a).length) return null
+  const location = {
+    current_city: 'your current city',
+    different_us: 'a lower-cost US city',
+    international: 'internationally',
+    multi: 'multiple places — a primary base plus somewhere else',
+    unsure: 'wherever makes sense when the time comes',
+  }[a.h3] ?? a.h3
+
+  const property = {
+    condo: 'a condo or co-op',
+    townhouse: 'a townhouse',
+    single_family: 'a single-family home',
+    multi_family: 'a multi-family property — live in one unit, rent the rest',
+    land: 'land to build something custom',
+  }[a.h4] ?? a.h4
+
+  const price = {
+    under_250k: 'under $250,000',
+    '250_500k': '$250,000–$500,000',
+    '500_500k': '$250,000–$500,000',
+    '500k_1m': '$500,000–$1,000,000',
+    over_1m: 'over $1,000,000',
+    unsure: 'TBD',
+  }[a.h5] ?? a.h5
+
+  const timeline = {
+    now: 'within the next 12 months',
+    '1_3': '1–3 years from now',
+    '3_5': '3–5 years out',
+    over_5: 'more than 5 years from now',
+    flexible: 'when the conditions are right',
+  }[a.h7] ?? a.h7
+
+  const role = {
+    primary_home: 'Your home is a home first — not an investment vehicle.',
+    investment: 'Property is a wealth engine in your plan. Rental income matters.',
+    both: 'You want both: a primary home and investment properties working in parallel.',
+    no_ownership: "You'll rent and invest the difference. No property required.",
+  }[a.h2] ?? ''
+
+  const priorities = Array.isArray(a.h8)
+    ? a.h8.map(s => s.replace(/_/g, ' ')).join(', ')
+    : (a.h8 ?? '').replace(/_/g, ' ')
+
+  return { location, property, price, timeline, role, priorities }
 }
 
-const HOME_PROPERTY_LABELS = {
-  condo: 'Condo / co-op',
-  townhouse: 'Townhouse',
-  single_family: 'Single-family home',
-  multi_family: 'Multi-family',
-  land: 'Land / custom build',
+function synthesizeCreative(a) {
+  if (!a || !Object.keys(a).length) return null
+  const monthly = {
+    under_1k: 'under $1,000/month',
+    '1_3k': '$1,000–$3,000/month',
+    '3_10k': '$3,000–$10,000/month',
+    over_10k: 'over $10,000/month',
+  }[a.cr6] ?? a.cr6
+
+  const goal = {
+    cover_basics: 'Cover your basic expenses so your full salary goes straight into investments.',
+    accelerate: 'Accelerate your FIRE timeline by 2–5 years.',
+    replace: 'Eventually replace your primary income entirely.',
+    legacy: 'Build something that keeps generating income after you stop working.',
+  }[a.cr3] ?? a.cr3
+
+  const approach = {
+    active: 'Active income now — you do the work, you get paid.',
+    passive: 'Passive — build once, earn indefinitely.',
+    both: 'Active income now while building toward passive streams.',
+    equity: "You're building to sell.",
+  }[a.cr5] ?? a.cr5
+
+  const vehicles = Array.isArray(a.cr2)
+    ? a.cr2.map(s => s.replace(/_/g, ' ')).join(', ')
+    : (a.cr2 ?? '').replace(/_/g, ' ')
+
+  const barrier = {
+    time: 'Time is the bottleneck right now.',
+    idea: "You're still finding the right vehicle.",
+    confidence: "Confidence — you haven't charged for it yet.",
+    audience: "You don't have an audience yet.",
+    tech: "Technical execution is the gap.",
+    energy: "Energy. The day job leaves nothing.",
+  }[a.cr7] ?? ''
+
+  return { monthly, goal, approach, vehicles, barrier }
 }
 
-const HOME_PRICE_LABELS = {
-  under_250k: 'Under $250k',
-  '250_500k': '$250k–$500k',
-  '500k_1m': '$500k–$1M',
-  over_1m: '$1M+',
-  unsure: 'TBD',
+function synthesizeRisk(result, answers) {
+  if (!result?.risk_profile) return null
+  const meta = RISK_META[result.risk_profile]
+  if (!meta) return null
+
+  const marketDrop = {
+    sell_all: "When markets drop, your instinct is to get out. That's worth knowing.",
+    sell_some: 'You reduce exposure when things get volatile.',
+    hold: 'You hold through volatility and wait it out.',
+    buy_more: 'When markets drop, you buy more. This is how aggressive portfolios are actually built.',
+  }[answers?.r1] ?? ''
+
+  const debtView = {
+    avoid: 'You want to be debt-free. Every dollar of leverage makes you uncomfortable.',
+    mortgage_only: 'Mortgage is the exception. Everything else stays clean.',
+    strategic: "You're comfortable using debt strategically when returns beat the rate.",
+    tool: "Debt is a tool. You use it when it makes mathematical sense.",
+  }[answers?.r5] ?? ''
+
+  return { meta, marketDrop, debtView }
 }
 
-const HOME_TIMELINE_LABELS = {
-  now: 'Within 12 months',
-  '1_3': '1–3 years',
-  '3_5': '3–5 years',
-  over_5: '5+ years',
-  flexible: 'When conditions are right',
-}
+// ── Components ─────────────────────────────────────────────────────────────
 
-const CREATIVE_GOAL_LABELS = {
-  cover_basics: 'Cover basics so salary goes straight to investments',
-  accelerate: 'Accelerate FIRE timeline by 2–5 years',
-  replace: 'Eventually replace job income entirely',
-  legacy: 'Build something that earns after I stop working',
-}
-
-const CREATIVE_MONTHLY_LABELS = {
-  under_1k: 'Under $1,000/mo',
-  '1_3k': '$1,000–$3,000/mo',
-  '3_10k': '$3,000–$10,000/mo',
-  over_10k: '$10,000+/mo',
-}
-
-const CAREER_DIRECTION_LABELS = {
-  same_more: 'Same field, higher comp',
-  pivot: 'Full pivot',
-  build: 'Building something of my own',
-  international: 'International market',
-  portfolio: 'Portfolio of income streams',
-}
-
-function Section({ label, color = '#C8A86B', children }) {
+function PlanSection({ label, color = '#C8A86B', children }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       style={{
-        background: '#0E0C08',
-        border: `1px solid ${color}22`,
-        borderRadius: '1.25rem',
-        padding: '2rem',
+        background: '#0A0906',
+        border: `1px solid ${color}1A`,
+        borderLeft: `3px solid ${color}`,
+        borderRadius: '1rem',
+        padding: '2rem 2rem 2rem 2rem',
         marginBottom: '1rem',
-        position: 'relative',
-        overflow: 'hidden',
       }}
     >
-      <div style={{ position: 'absolute', top: '-40px', right: '-40px', width: '120px', height: '120px', borderRadius: '50%', background: `radial-gradient(circle, ${color}12 0%, transparent 70%)`, pointerEvents: 'none' }} />
-      <p style={{ fontFamily: 'monospace', fontSize: '0.55rem', letterSpacing: '0.2em', color, marginBottom: '1.25rem' }}>{label}</p>
+      <p style={{ fontFamily: 'monospace', fontSize: '0.55rem', letterSpacing: '0.2em', color, marginBottom: '1.5rem' }}>{label}</p>
       {children}
     </motion.div>
   )
 }
 
-function Row({ label, value }) {
+function Stat({ label, value, color = '#F0EDE8' }) {
   if (!value) return null
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '0.6rem 0', borderBottom: '1px solid #1C2320' }}>
-      <p style={{ fontFamily: 'monospace', fontSize: '0.6rem', color: '#4A6A5A', letterSpacing: '0.08em' }}>{label}</p>
-      <p style={{ fontFamily: '"Playfair Display", serif', fontSize: '0.95rem', color: '#F0EDE8', textAlign: 'right', maxWidth: '55%' }}>{value}</p>
+    <div style={{ marginBottom: '1.25rem' }}>
+      <p style={{ fontFamily: 'monospace', fontSize: '0.55rem', letterSpacing: '0.12em', color: '#3A4A40', marginBottom: '0.3rem' }}>{label}</p>
+      <p style={{ fontFamily: '"Playfair Display", serif', fontSize: '1.1rem', color, lineHeight: 1.3 }}>{value}</p>
     </div>
   )
 }
+
+function Body({ children }) {
+  return (
+    <p style={{ fontFamily: '"DM Sans", sans-serif', fontSize: '0.9rem', color: '#9A9286', lineHeight: 1.8, marginTop: '1.25rem' }}>
+      {children}
+    </p>
+  )
+}
+
+function Divider() {
+  return <div style={{ height: '1px', background: '#1A1C18', margin: '1.25rem 0' }} />
+}
+
+// ── Page ───────────────────────────────────────────────────────────────────
 
 export default function Plan() {
   const { user } = useAuthStore()
@@ -141,162 +244,147 @@ export default function Plan() {
 
   if (loading) return (
     <div className="page" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '80vh' }}>
-      <p style={{ fontFamily: 'monospace', fontSize: '0.7rem', color: '#4A6A5A' }}>loading your plan…</p>
+      <p style={{ fontFamily: 'monospace', fontSize: '0.7rem', color: '#4A6A5A' }}>assembling your plan…</p>
     </div>
   )
 
-  const fireResult     = results['fire_type']?.result ?? {}
-  const riskResult     = results['risk']?.result ?? {}
-  const careerAnswers  = results['career']?.answers ?? {}
-  const homeAnswers    = results['home']?.answers ?? {}
+  const fireResult      = results['fire_type']?.result ?? {}
+  const riskResult      = results['risk']?.result ?? {}
+  const riskAnswers     = results['risk']?.answers ?? {}
+  const careerAnswers   = results['career']?.answers ?? {}
+  const homeAnswers     = results['home']?.answers ?? {}
   const creativeAnswers = results['creative']?.answers ?? {}
 
   const fireType  = fireResult.fire_type
   const fireMeta  = FIRE_TYPE_META[fireType]
   const fireColor = FIRE_COLORS[fireType] ?? '#C8A86B'
-  const riskMeta  = RISK_META[riskResult.risk_profile]
 
-  const SLUGS = ['fire_type', 'career', 'home', 'creative', 'risk']
+  const career   = synthesizeCareer(careerAnswers)
+  const home     = synthesizeHome(homeAnswers)
+  const creative = synthesizeCreative(creativeAnswers)
+  const risk     = synthesizeRisk(riskResult, riskAnswers)
+
+  const SLUGS   = ['fire_type', 'career', 'home', 'creative', 'risk']
+  const missing = SLUGS.filter(s => !results[s])
   const completed = SLUGS.filter(s => results[s])
-  const missing   = SLUGS.filter(s => !results[s])
 
   return (
     <div className="page" style={{ minHeight: '100vh' }}>
-      <div style={{ maxWidth: '720px', margin: '0 auto', padding: 'clamp(3rem,8vw,5rem) 1.5rem' }}>
+      <div style={{ maxWidth: '680px', margin: '0 auto', padding: 'clamp(3rem,8vw,5rem) 1.5rem' }}>
 
-        {/* Back */}
         <Link to="/" style={{ textDecoration: 'none' }}>
-          <p style={{ fontFamily: 'monospace', fontSize: '0.65rem', color: '#4A6A5A', letterSpacing: '0.1em', marginBottom: '3rem', cursor: 'pointer' }}>← back</p>
+          <p style={{ fontFamily: 'monospace', fontSize: '0.65rem', color: '#3A4A40', letterSpacing: '0.1em', marginBottom: '3rem' }}>← back</p>
         </Link>
 
         {/* Hero */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: '3rem' }}>
-          <p style={{ fontFamily: 'monospace', fontSize: '0.55rem', letterSpacing: '0.25em', color: fireColor, marginBottom: '1rem' }}>MY RITUAL WEALTH PLAN</p>
-          <h1 style={{ fontFamily: '"Playfair Display", Georgia, serif', fontSize: 'clamp(36px,6vw,64px)', fontWeight: 400, color: '#F0EDE8', lineHeight: 1.05, marginBottom: '1rem' }}>
-            {fireMeta ? fireMeta.label : 'Your FIRE Plan'}
-            {fireMeta?.number && (
-              <span style={{ fontStyle: 'italic', color: fireColor }}> · {fmt(fireMeta.number)}</span>
-            )}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: '3.5rem' }}>
+          <p style={{ fontFamily: 'monospace', fontSize: '0.55rem', letterSpacing: '0.25em', color: fireColor, marginBottom: '1rem' }}>
+            MY RITUAL WEALTH PLAN
+          </p>
+          <h1 style={{ fontFamily: '"Playfair Display", Georgia, serif', fontSize: 'clamp(40px,7vw,72px)', fontWeight: 400, color: '#F0EDE8', lineHeight: 1.0, marginBottom: '1.25rem' }}>
+            {fireMeta?.label ?? 'Your Plan'}.
           </h1>
+          {fireMeta?.number && (
+            <p style={{ fontFamily: '"Playfair Display", serif', fontSize: 'clamp(24px,4vw,40px)', fontStyle: 'italic', color: fireColor, marginBottom: '1.5rem' }}>
+              Target: {fmt(fireMeta.number)}
+            </p>
+          )}
           {fireMeta?.desc && (
-            <p style={{ fontFamily: '"Cormorant Garamond", serif', fontStyle: 'italic', fontSize: '1.1rem', color: '#8A9E96', lineHeight: 1.7, maxWidth: '520px' }}>
+            <p style={{ fontFamily: '"Cormorant Garamond", serif', fontStyle: 'italic', fontSize: '1.15rem', color: '#6A7A6A', lineHeight: 1.75, maxWidth: '500px' }}>
               {fireMeta.desc}
             </p>
           )}
         </motion.div>
 
-        {/* Progress */}
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
-          style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '3rem', flexWrap: 'wrap' }}>
-          <div style={{ display: 'flex', gap: '0.4rem' }}>
-            {SLUGS.map(s => (
-              <div key={s} style={{ width: '36px', height: '4px', borderRadius: '2px', background: results[s] ? fireColor : '#1C2320' }} />
-            ))}
-          </div>
-          <p style={{ fontFamily: 'monospace', fontSize: '0.6rem', color: '#4A6A5A', letterSpacing: '0.1em' }}>
-            {completed.length}/5 quizzes complete
-          </p>
+        {/* Progress bar */}
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}
+          style={{ display: 'flex', gap: '0.4rem', marginBottom: '3.5rem' }}>
+          {SLUGS.map(s => (
+            <div key={s} style={{ flex: 1, height: '3px', borderRadius: '2px', background: results[s] ? fireColor : '#1C2320' }} />
+          ))}
         </motion.div>
 
-        {/* ── FIRE TARGET ─────────────────────────────────────────────────── */}
+        {/* ── FIRE TARGET ──────────────────────────────────────────────── */}
         {fireMeta && (
-          <Section label="FIRE TARGET" color={fireColor}>
-            <p style={{ fontFamily: '"Playfair Display", serif', fontSize: 'clamp(2rem,5vw,3rem)', color: fireColor, marginBottom: '0.25rem' }}>
-              {fmt(fireMeta.number)}
-            </p>
-            <p style={{ fontFamily: 'monospace', fontSize: '0.6rem', color: '#4A6A5A', letterSpacing: '0.1em', marginBottom: '1.5rem' }}>
-              target · {fireType?.replace('_', ' ').toUpperCase()}
-            </p>
-            <Row label="FIRE TYPE" value={fireMeta.label} />
-            <Row label="ANNUAL SPENDING (RETIREMENT)" value="$80,000" />
-            <Row label="WITHDRAWAL RATE" value="4% rule" />
-            <Row label="LEGACY GOAL" value="Moderate — leave something, not the whole point" />
-          </Section>
+          <PlanSection label="FIRE TARGET" color={fireColor}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '0.5rem' }}>
+              <Stat label="TARGET" value={fmt(fireMeta.number)} color={fireColor} />
+              <Stat label="FIRE TYPE" value={fireMeta.label} color="#F0EDE8" />
+              <Stat label="ANNUAL RETIREMENT SPEND" value="$80,000" />
+              <Stat label="WITHDRAWAL RATE" value="4% rule" />
+            </div>
+            <Divider />
+            <Body>
+              The 4% rule means you can withdraw {fmt(Math.round((fireMeta.number ?? 0) * 0.04))} per year from a {fmt(fireMeta.number)} portfolio indefinitely — accounting for inflation and market cycles over 30+ years. That's the number you're building toward. Every dollar you invest today compounds toward it.
+            </Body>
+          </PlanSection>
         )}
 
-        {/* ── RISK PROFILE ────────────────────────────────────────────────── */}
-        {riskMeta && (
-          <Section label="RISK PROFILE" color="#6AAD8A">
-            <Row label="PROFILE" value={riskMeta.label} />
-            <Row label="ALLOCATION" value={riskMeta.allocation} />
-            <p style={{ fontFamily: '"DM Sans", sans-serif', fontSize: '0.875rem', color: '#8A9E96', lineHeight: 1.7, marginTop: '1rem' }}>
-              {riskMeta.desc}
-            </p>
-          </Section>
+        {/* ── RISK PROFILE ─────────────────────────────────────────────── */}
+        {risk && (
+          <PlanSection label="INVESTMENT PROFILE" color="#6AAD8A">
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '0.5rem' }}>
+              <Stat label="PROFILE" value={risk.meta.label} color="#6AAD8A" />
+              <Stat label="ALLOCATION" value={risk.meta.allocation} />
+            </div>
+            <Divider />
+            {risk.marketDrop && <Body>{risk.marketDrop}</Body>}
+            {risk.debtView && <Body>{risk.debtView}</Body>}
+          </PlanSection>
         )}
 
-        {/* ── CAREER PATH ─────────────────────────────────────────────────── */}
-        {Object.keys(careerAnswers).length > 0 && (
-          <Section label="CAREER PATH" color="#A89BC4">
-            <Row label="DIRECTION" value={CAREER_DIRECTION_LABELS[careerAnswers.c3]} />
-            <Row label="3-YEAR INCOME TARGET" value={CAREER_LABELS[careerAnswers.c8]} />
-            <Row label="RELOCATION" value={
-              careerAnswers.c5 === 'yes_international' ? 'Yes — international especially' :
-              careerAnswers.c5 === 'yes_us' ? 'Yes — within the US' :
-              careerAnswers.c5 === 'yes_anywhere' ? 'Yes — anywhere' : 'No'
-            } />
-            <Row label="LEADERSHIP" value={
-              careerAnswers.c6 === 'own_team' ? 'Build my own team' :
-              careerAnswers.c6 === 'love' ? 'Love it' :
-              careerAnswers.c6 === 'open' ? 'Open to it for the right comp' : 'Prefer IC'
-            } />
-            {careerAnswers.c7 && (
-              <Row label="STRONGEST ASSETS" value={
-                (Array.isArray(careerAnswers.c7) ? careerAnswers.c7 : [careerAnswers.c7])
-                  .map(s => s.replace(/_/g, ' ')).join(', ')
-              } />
-            )}
-          </Section>
+        {/* ── CAREER ───────────────────────────────────────────────────── */}
+        {career && (
+          <PlanSection label="CAREER PATH" color="#A89BC4">
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '0.5rem' }}>
+              <Stat label="3-YEAR INCOME TARGET" value={career.target} color="#A89BC4" />
+              <Stat label="DIRECTION" value={career.direction} />
+            </div>
+            <Divider />
+            {career.assets && <Stat label="YOUR STRONGEST ASSETS" value={career.assets} />}
+            <Body>{career.leadership}</Body>
+            <Body>{career.relocation}</Body>
+          </PlanSection>
         )}
 
-        {/* ── HOME PLAN ───────────────────────────────────────────────────── */}
-        {Object.keys(homeAnswers).length > 0 && (
-          <Section label="HOME PLAN" color="#C4717A">
-            <Row label="LOCATION STRATEGY" value={HOME_LOCATION_LABELS[homeAnswers.h3]} />
-            <Row label="PROPERTY TYPE" value={HOME_PROPERTY_LABELS[homeAnswers.h4]} />
-            <Row label="PRICE RANGE" value={HOME_PRICE_LABELS[homeAnswers.h5]} />
-            <Row label="PURCHASE TIMELINE" value={HOME_TIMELINE_LABELS[homeAnswers.h7]} />
-            <Row label="ROLE IN FIRE PLAN" value={
-              homeAnswers.h2 === 'both' ? 'Primary home + investment properties' :
-              homeAnswers.h2 === 'investment' ? 'Investment / rental income' :
-              homeAnswers.h2 === 'primary_home' ? 'Primary home only' : 'Renting, investing the difference'
-            } />
-            {homeAnswers.h8 && (
-              <Row label="PRIORITIES" value={
-                (Array.isArray(homeAnswers.h8) ? homeAnswers.h8 : [homeAnswers.h8])
-                  .map(s => s.replace(/_/g, ' ')).join(', ')
-              } />
-            )}
-          </Section>
+        {/* ── HOME PLAN ────────────────────────────────────────────────── */}
+        {home && (
+          <PlanSection label="HOME PLAN" color="#C4717A">
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '0.5rem' }}>
+              <Stat label="FIRST PURCHASE" value={`${home.property} · ${home.price}`} color="#C4717A" />
+              <Stat label="TIMELINE" value={home.timeline} />
+            </div>
+            <Divider />
+            <Stat label="LOCATION STRATEGY" value={home.location} />
+            {home.priorities && <Stat label="WHAT MATTERS MOST" value={home.priorities} />}
+            <Body>{home.role}</Body>
+          </PlanSection>
         )}
 
-        {/* ── CREATIVE INCOME ─────────────────────────────────────────────── */}
-        {Object.keys(creativeAnswers).length > 0 && (
-          <Section label="CREATIVE INCOME" color="#7AB4C8">
-            <Row label="MONTHLY TARGET" value={CREATIVE_MONTHLY_LABELS[creativeAnswers.cr6]} />
-            <Row label="GOAL" value={CREATIVE_GOAL_LABELS[creativeAnswers.cr3]} />
-            <Row label="APPROACH" value={
-              creativeAnswers.cr5 === 'both' ? 'Active now, building toward passive' :
-              creativeAnswers.cr5 === 'passive' ? 'Passive — build once, earn forever' :
-              creativeAnswers.cr5 === 'equity' ? 'Build something and sell it' : 'Active — freelance / consulting'
-            } />
-            {creativeAnswers.cr2 && (
-              <Row label="VEHICLES" value={
-                (Array.isArray(creativeAnswers.cr2) ? creativeAnswers.cr2 : [creativeAnswers.cr2])
-                  .map(s => s.replace(/_/g, ' ')).join(', ')
-              } />
-            )}
-          </Section>
+        {/* ── CREATIVE INCOME ──────────────────────────────────────────── */}
+        {creative && (
+          <PlanSection label="CREATIVE INCOME" color="#7AB4C8">
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '0.5rem' }}>
+              <Stat label="MONTHLY TARGET" value={creative.monthly} color="#7AB4C8" />
+              <Stat label="APPROACH" value={creative.approach} />
+            </div>
+            <Divider />
+            {creative.vehicles && <Stat label="YOUR VEHICLES" value={creative.vehicles} />}
+            <Body>{creative.goal}</Body>
+            {creative.barrier && <Body>Current bottleneck: {creative.barrier}</Body>}
+          </PlanSection>
         )}
 
-        {/* ── MISSING QUIZZES ─────────────────────────────────────────────── */}
+        {/* ── MISSING ──────────────────────────────────────────────────── */}
         {missing.length > 0 && (
-          <div style={{ padding: '1.5rem', background: 'rgba(200,168,107,0.04)', border: '1px dashed #2A3530', borderRadius: '1rem', marginTop: '0.5rem' }}>
-            <p style={{ fontFamily: 'monospace', fontSize: '0.6rem', color: '#C8A86B', letterSpacing: '0.15em', marginBottom: '1rem' }}>COMPLETE YOUR PLAN</p>
+          <div style={{ padding: '1.5rem', border: '1px dashed #1C2320', borderRadius: '1rem', marginTop: '0.5rem' }}>
+            <p style={{ fontFamily: 'monospace', fontSize: '0.6rem', color: '#C8A86B', letterSpacing: '0.15em', marginBottom: '1rem' }}>
+              {missing.length} QUIZ{missing.length > 1 ? 'ZES' : ''} LEFT TO COMPLETE YOUR PLAN
+            </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
               {missing.map(s => (
                 <Link key={s} to={`/quiz/${s}`} style={{ textDecoration: 'none' }}>
-                  <span style={{ fontFamily: 'monospace', fontSize: '0.6rem', color: '#4A6A5A', padding: '0.35rem 0.85rem', border: '1px solid #2A3530', borderRadius: '9999px', letterSpacing: '0.1em', cursor: 'pointer' }}>
+                  <span style={{ fontFamily: 'monospace', fontSize: '0.6rem', color: '#4A6A5A', padding: '0.35rem 0.85rem', border: '1px solid #2A3530', borderRadius: '9999px', letterSpacing: '0.1em' }}>
                     {s.replace('_', ' ')} →
                   </span>
                 </Link>
@@ -305,8 +393,8 @@ export default function Plan() {
           </div>
         )}
 
-        {/* ── FOOTER ──────────────────────────────────────────────────────── */}
-        <div style={{ marginTop: '3rem', paddingTop: '2rem', borderTop: '1px solid #1C2320', display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+        {/* Footer */}
+        <div style={{ marginTop: '3rem', paddingTop: '2rem', borderTop: '1px solid #1A1C18', display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
           <Link to="/" style={{ textDecoration: 'none' }}>
             <button className="btn-ghost">← home</button>
           </Link>
