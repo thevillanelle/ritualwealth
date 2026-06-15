@@ -716,18 +716,27 @@ export function deriveMilestones(answers) {
   let efSavings = savings
   let efMonthsNeeded = 0
   if (efSavings < efTarget) {
-    efMonthsNeeded = debtFreeMonths + Math.ceil((efTarget - efSavings) / postDebtSurplus)
+    if (postDebtSurplus <= 0) {
+      efMonthsNeeded = null  // can't reach EF target — income doesn't exceed expenses
+    } else {
+      efMonthsNeeded = debtFreeMonths + Math.ceil((efTarget - efSavings) / postDebtSurplus)
+    }
   } else {
     efMonthsNeeded = debtFreeMonths
   }
 
   // Months to down payment (after emergency fund)
-  let dpMonthsNeeded = 0
+  let dpMonthsNeeded = null
   if (downPmt > 0) {
-    dpMonthsNeeded = efMonthsNeeded + Math.ceil(downPmt / postDebtSurplus)
+    if (postDebtSurplus <= 0 || efMonthsNeeded === null) {
+      dpMonthsNeeded = null
+    } else {
+      dpMonthsNeeded = efMonthsNeeded + Math.ceil(downPmt / postDebtSurplus)
+    }
   }
 
   function addMonths(months) {
+    if (months === null || months === undefined) return null
     const d = new Date()
     d.setMonth(d.getMonth() + Math.round(months))
     return d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
@@ -740,9 +749,9 @@ export function deriveMilestones(answers) {
     debtFreeDate:  debt > 0 ? addMonths(debtFreeMonths) : null,
     efTarget,
     efMonthsNeeded,
-    efDate:        addMonths(efMonthsNeeded),
+    efDate:        efMonthsNeeded != null ? addMonths(efMonthsNeeded) : null,
     dpMonthsNeeded,
-    dpDate:        downPmt > 0 ? addMonths(dpMonthsNeeded) : null,
+    dpDate:        dpMonthsNeeded != null ? addMonths(dpMonthsNeeded) : null,
     income, expenses, debt, debtPmt, savings, homePrice, downPmt, efMonths,
   }
 }
