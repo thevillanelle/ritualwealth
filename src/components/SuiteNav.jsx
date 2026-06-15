@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuthStore } from '../stores/useAuthStore'
+import NotificationBell from './NotificationBell'
 
 function getInitials(user) {
   const name = user?.user_metadata?.full_name || user?.user_metadata?.name
@@ -32,6 +33,9 @@ export default function SuiteNav() {
 
   return (
     <>
+      <div style={{ position: 'fixed', top: '1rem', right: '4rem', zIndex: 40 }}>
+        <NotificationBell />
+      </div>
       <button
         onClick={() => setOpen(true)}
         style={{
