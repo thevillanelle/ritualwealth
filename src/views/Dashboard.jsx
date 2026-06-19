@@ -1,11 +1,12 @@
+'use client'
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import { useAuthStore } from '../stores/useAuthStore'
-import { supabase } from '../lib/supabase'
+import { supabase } from '../lib/supabase/client'
 import { FIRE_TYPE_META, RISK_META } from '../data/quizzes'
 
-const ATELIER_URL = import.meta.env.VITE_ATELIER_URL ?? 'https://studio.ritualware.app'
+const ATELIER_URL = process.env.NEXT_PUBLIC_ATELIER_URL ?? 'https://studio.ritualware.app'
 
 const SLUGS = ['fire_type', 'career', 'home', 'creative', 'risk']
 
@@ -88,7 +89,7 @@ export default function Dashboard() {
             )}
           </h2>
         </div>
-        <Link to="/plan" style={{ textDecoration: 'none', flexShrink: 0 }}>
+        <Link href="/plan" style={{ textDecoration: 'none', flexShrink: 0 }}>
           <button className="btn-ghost" style={{ fontSize: '0.75rem', padding: '0.5rem 1rem' }}>
             View full plan →
           </button>
@@ -135,7 +136,7 @@ export default function Dashboard() {
           {completed.length}/5 quizzes complete
         </p>
         {!allDone && (
-          <Link to={`/quiz/${SLUGS.find(s => !results[s])}`} style={{ textDecoration: 'none', marginLeft: 'auto' }}>
+          <Link href={`/quiz/${SLUGS.find(s => !results[s])}`} style={{ textDecoration: 'none', marginLeft: 'auto' }}>
             <span style={{ fontFamily: 'monospace', fontSize: '0.6rem', color: fireColor, letterSpacing: '0.1em', cursor: 'pointer' }}>
               continue →
             </span>

@@ -1,5 +1,6 @@
+'use client'
 import { create } from 'zustand'
-import { supabase } from '../lib/supabase'
+import { supabase } from '../lib/supabase/client'
 
 export const useSocialStore = create((set, get) => ({
   friends:       [],

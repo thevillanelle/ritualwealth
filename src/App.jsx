@@ -2,13 +2,14 @@ import { useEffect } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { useAuthStore } from './stores/useAuthStore'
 import SuiteNav     from './components/SuiteNav'
-import Welcome      from './pages/Welcome'
-import Quiz         from './pages/Quiz'
-import Results      from './pages/Results'
-import Plan         from './pages/Plan'
-import AuthCallback from './pages/AuthCallback'
-import WhatIsFire  from './pages/WhatIsFire'
-import DebtPayoff  from './pages/DebtPayoff'
+import Welcome      from './views/Welcome'
+import Quiz         from './views/Quiz'
+import Results      from './views/Results'
+import Plan         from './views/Plan'
+import AuthCallback from './views/AuthCallback'
+import WhatIsFire  from './views/WhatIsFire'
+import DebtPayoff      from './views/DebtPayoff'
+import RitualProfile   from './views/RitualProfile'
 
 export default function App() {
   const { initialize } = useAuthStore()
@@ -24,6 +25,7 @@ export default function App() {
         <Route path="/plan"                element={<Plan />} />
         <Route path="/what-is-fire"        element={<WhatIsFire />} />
         <Route path="/tools/debt"          element={<DebtPayoff />} />
+        <Route path="/profile"             element={<RitualProfile />} />
         <Route path="/auth/callback"       element={<AuthCallback />} />
       </Routes>
     </BrowserRouter>
