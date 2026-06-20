@@ -1,5 +1,6 @@
+'use client'
 import { motion } from 'framer-motion'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 
 const TYPES = [
   {
@@ -87,7 +88,7 @@ export default function WhatIsFire() {
       <div style={{ maxWidth: '680px', margin: '0 auto', padding: 'clamp(3rem,8vw,6rem) 1.5rem' }}>
 
         {/* Back */}
-        <Link to="/" style={{ textDecoration: 'none' }}>
+        <Link href="/" style={{ textDecoration: 'none' }}>
           <p style={{ fontFamily: 'monospace', fontSize: '0.65rem', color: '#4A6A5A', letterSpacing: '0.1em', marginBottom: '3rem', cursor: 'pointer' }}>
             ← back
           </p>
@@ -138,7 +139,7 @@ export default function WhatIsFire() {
           <p style={{ fontFamily: '"Cormorant Garamond", Georgia, serif', fontStyle: 'italic', fontSize: '1.1rem', color: '#8A9E96', marginBottom: '2rem' }}>
             Ready to find your number?
           </p>
-          <Link to="/quiz/fire_type">
+          <Link href="/quiz/fire_type">
             <button className="btn-primary">Start the FIRE Type quiz ✦</button>
           </Link>
         </motion.div>

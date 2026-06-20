@@ -1,5 +1,6 @@
+'use client'
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuthStore } from '../stores/useAuthStore'
 import NotificationBell from './NotificationBell'
@@ -21,9 +22,10 @@ const SUITE = [
 ]
 
 const NAV = [
-  { to: '/',     label: 'Home' },
-  { to: '/plan', label: 'My Plan' },
+  { to: '/',           label: 'Home' },
+  { to: '/plan',       label: 'My Plan' },
   { to: '/tools/debt', label: 'Debt Payoff' },
+  { to: '/profile',    label: 'My Ritual Profile' },
 ]
 
 export default function SuiteNav() {

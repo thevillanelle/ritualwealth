@@ -1,10 +1,11 @@
+'use client'
 import { motion } from 'framer-motion'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import { useAuthStore } from '../stores/useAuthStore'
 import { QUIZZES } from '../data/quizzes'
 import Dashboard from './Dashboard'
 
-const ATELIER_URL = import.meta.env.VITE_ATELIER_URL ?? 'https://studio.ritualware.app'
+const ATELIER_URL = process.env.NEXT_PUBLIC_ATELIER_URL ?? 'https://studio.ritualware.app'
 
 const TILE_META = {
   fire_type: {
@@ -37,7 +38,7 @@ const TILE_META = {
   },
   debt_payoff: {
     headline: 'Debt payoff',
-    sub:      'Enter your balance and see the exact date you're out.',
+    sub:      "Enter your balance and see the exact date you're out.",
     bg:       'linear-gradient(135deg, #1C1214 0%, #2A0E14 100%)',
     accent:   '#C4717A',
     size:     'small',
@@ -56,6 +57,13 @@ const TILE_META = {
     accent:   '#C8A86B',
     size:     'small',
   },
+  risk: {
+    headline: 'Risk profile',
+    sub:      'Conservative or aggressive — find your allocation.',
+    bg:       'linear-gradient(135deg, #121C18 0%, #0A1A14 100%)',
+    accent:   '#6AAD8A',
+    size:     'small',
+  },
 }
 
 const TILE_ROUTES = {
@@ -64,9 +72,10 @@ const TILE_ROUTES = {
 
 function QuizTile({ quiz, index }) {
   const meta = TILE_META[quiz.slug]
+  if (!meta) return null
   const to   = TILE_ROUTES[quiz.slug] ?? `/quiz/${quiz.slug}`
   return (
-    <Link to={to} style={{ textDecoration: 'none' }}>
+    <Link href={to} style={{ textDecoration: 'none' }}>
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
@@ -169,7 +178,7 @@ export default function Welcome() {
           <Dashboard />
 
           {/* Explainer tile — first */}
-          <Link to="/what-is-fire" style={{ textDecoration: 'none', gridColumn: 'span 1' }}>
+          <Link href="/what-is-fire" style={{ textDecoration: 'none', gridColumn: 'span 1' }}>
             <motion.div
               initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}
               whileHover={{ scale: 1.015 }}
@@ -211,7 +220,7 @@ export default function Welcome() {
         {/* CTAs */}
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
           style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-          <Link to="/quiz/fire_type" style={{ flex: 1, minWidth: '200px' }}>
+          <Link href="/quiz/fire_type" style={{ flex: 1, minWidth: '200px' }}>
             <button className="btn-primary" style={{ width: '100%' }}>
               Start with FIRE Type ✦
             </button>

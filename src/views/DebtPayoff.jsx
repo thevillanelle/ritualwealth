@@ -1,5 +1,6 @@
+'use client'
 import { useState, useCallback } from 'react'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import { motion } from 'framer-motion'
 
 function fmt(n) { return n != null ? '$' + Number(n).toLocaleString() : '—' }
@@ -69,7 +70,7 @@ export default function DebtPayoff() {
     <div className="page" style={{ minHeight: '100vh' }}>
       <div style={{ maxWidth: '640px', margin: '0 auto', padding: 'clamp(3rem,8vw,5rem) 1.5rem' }}>
 
-        <Link to="/" style={{ textDecoration: 'none' }}>
+        <Link href="/" style={{ textDecoration: 'none' }}>
           <p style={{ fontFamily: 'monospace', fontSize: '0.65rem', color: '#3A4A40', letterSpacing: '0.1em', marginBottom: '3rem' }}>← back</p>
         </Link>
 

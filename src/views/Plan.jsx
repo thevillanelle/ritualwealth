@@ -1,8 +1,9 @@
+'use client'
 import { useEffect, useState, useCallback } from 'react'
 import { motion } from 'framer-motion'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import { useAuthStore } from '../stores/useAuthStore'
-import { supabase } from '../lib/supabase'
+import { supabase } from '../lib/supabase/client'
 import { FIRE_TYPE_META, deriveMilestones } from '../data/quizzes'
 
 function fmt(n) { return n != null ? '$' + Number(n).toLocaleString() : '—' }
@@ -362,7 +363,7 @@ export default function Plan() {
     <div className="page" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '80vh' }}>
       <div style={{ textAlign: 'center' }}>
         <p style={{ fontFamily: '"Playfair Display", serif', fontSize: '1.5rem', color: '#F0EDE8', marginBottom: '1.5rem' }}>Sign in to see your plan.</p>
-        <Link to="/"><button className="btn-ghost">← back</button></Link>
+        <Link href="/"><button className="btn-ghost">← back</button></Link>
       </div>
     </div>
   )
@@ -405,7 +406,7 @@ export default function Plan() {
     <div className="page" style={{ minHeight: '100vh' }}>
       <div style={{ maxWidth: '680px', margin: '0 auto', padding: 'clamp(3rem,8vw,5rem) 1.5rem' }}>
 
-        <Link to="/" style={{ textDecoration: 'none' }}>
+        <Link href="/" style={{ textDecoration: 'none' }}>
           <p style={{ fontFamily: 'monospace', fontSize: '0.65rem', color: '#3A4A40', letterSpacing: '0.1em', marginBottom: '3rem' }}>← back</p>
         </Link>
 
@@ -508,7 +509,7 @@ export default function Plan() {
             /* Prompt to take milestones quiz */
             <div>
               <Prose>Complete the Milestone Timeline quiz to generate your personal dates — debt-free, emergency fund, down payment, and beyond.</Prose>
-              <Link to="/quiz/milestones" style={{ textDecoration: 'none' }}>
+              <Link href="/quiz/milestones" style={{ textDecoration: 'none' }}>
                 <button className="btn-primary" style={{ marginTop: '1rem' }}>Build my timeline →</button>
               </Link>
             </div>
@@ -537,7 +538,7 @@ export default function Plan() {
         ) : (
           <PlanSection label="CAREER TRACKS" color="#A89BC4">
             <Prose>Name the exact roles you are working toward — titles, companies, comp targets, and timelines.</Prose>
-            <Link to="/quiz/career_tracks" style={{ textDecoration: 'none' }}>
+            <Link href="/quiz/career_tracks" style={{ textDecoration: 'none' }}>
               <button className="btn-primary" style={{ marginTop: '1rem' }}>Add my career tracks →</button>
             </Link>
           </PlanSection>
@@ -630,8 +631,8 @@ export default function Plan() {
         )}
 
         <div style={{ marginTop: '3rem', paddingTop: '2rem', borderTop: '1px solid #12140F', display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-          <Link to="/" style={{ textDecoration: 'none' }}><button className="btn-ghost">← home</button></Link>
-          <Link to="/quiz/fire_type" style={{ textDecoration: 'none' }}><button className="btn-ghost">retake a quiz</button></Link>
+          <Link href="/" style={{ textDecoration: 'none' }}><button className="btn-ghost">← home</button></Link>
+          <Link href="/quiz/fire_type" style={{ textDecoration: 'none' }}><button className="btn-ghost">retake a quiz</button></Link>
         </div>
 
       </div>

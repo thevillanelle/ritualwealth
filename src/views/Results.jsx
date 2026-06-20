@@ -1,6 +1,11 @@
-import { useLocation, useNavigate, useParams, Link } from 'react-router-dom'
+'use client'
+import { useEffect, useState } from 'react'
+import { useParams, useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
+import Link from 'next/link'
 import { QUIZZES } from '../data/quizzes'
+import { supabase } from '../lib/supabase/client'
+import { useAuthStore } from '../stores/useAuthStore'
 
 const NEXT_QUIZ = {
   fire_type: 'career',
@@ -32,18 +37,38 @@ function fmt(n) {
 
 export default function Results() {
   const { slug } = useParams()
-  const { state } = useLocation()
-  const navigate = useNavigate()
+  const router = useRouter()
+  const { user, signInWithGoogle } = useAuthStore()
+  const [result, setResult] = useState(null)
+  const [loading, setLoading] = useState(true)
 
   const quiz = QUIZZES.find(q => q.slug === slug)
   const nextSlug = NEXT_QUIZ[slug]
   const nextQuiz = nextSlug ? QUIZZES.find(q => q.slug === nextSlug) : null
-  const result = state?.result ?? {}
 
-  if (!quiz || !state) {
-    navigate('/')
-    return null
-  }
+  useEffect(() => {
+    if (!quiz) { router.push('/'); return }
+    // Fetch the most recent result for this quiz from Supabase
+    if (!user) {
+      const cached = localStorage.getItem(`vile_fire_result_${slug}`)
+      setResult(cached ? JSON.parse(cached).result : {})
+      setLoading(false)
+      return
+    }
+    supabase
+      .from('fire_quiz_results')
+      .select('result')
+      .eq('user_id', user.id)
+      .eq('quiz_slug', slug)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .then(({ data }) => {
+        setResult(data?.[0]?.result ?? {})
+        setLoading(false)
+      })
+  }, [slug, user])
+
+  if (!quiz || loading) return null
 
   return (
     <div className="page">
@@ -54,7 +79,7 @@ export default function Results() {
           <p className="label" style={{ marginBottom: '1rem', color: quiz.color }}>{quiz.slug.replace('_', ' ')}</p>
 
           {/* FIRE Type result */}
-          {slug === 'fire_type' && result.fire_type && (
+          {slug === 'fire_type' && result?.fire_type && (
             <>
               <h1 style={{ fontFamily: '"Playfair Display", Georgia, serif', fontSize: 'clamp(36px,6vw,64px)', fontWeight: 400, color: '#F0EDE8', lineHeight: 1.05, marginBottom: '0.5rem' }}>
                 {FIRE_TYPE_LABELS[result.fire_type]}
@@ -69,7 +94,7 @@ export default function Results() {
           )}
 
           {/* Risk result */}
-          {slug === 'risk' && result.risk_profile && (
+          {slug === 'risk' && result?.risk_profile && (
             <>
               <h1 style={{ fontFamily: '"Playfair Display", Georgia, serif', fontSize: 'clamp(36px,6vw,64px)', fontWeight: 400, color: '#F0EDE8', lineHeight: 1.05, marginBottom: '0.5rem' }}>
                 {RISK_LABELS[result.risk_profile]}
@@ -98,22 +123,39 @@ export default function Results() {
             </>
           )}
 
+          {/* Guest CTA */}
+          {!user && (
+            <div className="card" style={{ marginBottom: '1.5rem', background: 'rgba(200,168,107,0.08)', border: '1px solid rgba(200,168,107,0.3)' }}>
+              <p style={{ fontFamily: 'monospace', fontSize: '0.65rem', color: '#C8A86B', letterSpacing: '0.1em', marginBottom: '0.5rem' }}>SAVE YOUR RESULTS</p>
+              <p style={{ fontFamily: '"DM Sans", sans-serif', fontSize: '0.85rem', color: '#C8BFB0', lineHeight: 1.6, marginBottom: '1rem' }}>
+                Sign in to save your FIRE quiz results and build your complete plan.
+              </p>
+              <button
+                onClick={() => signInWithGoogle()}
+                className="btn-primary"
+                style={{ width: '100%' }}
+              >
+                Continue with Google ✦
+              </button>
+            </div>
+          )}
+
           {/* Navigation */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '2rem' }}>
             {nextQuiz ? (
-              <Link to={`/quiz/${nextQuiz.slug}`}>
+              <Link href={`/quiz/${nextQuiz.slug}`}>
                 <button className="btn-primary" style={{ width: '100%', background: nextQuiz.color }}>
                   Next: {nextQuiz.title} →
                 </button>
               </Link>
             ) : (
-              <Link to="/plan">
+              <Link href="/plan">
                 <button className="btn-primary" style={{ width: '100%' }}>
                   See my complete FIRE plan ✦
                 </button>
               </Link>
             )}
-            <Link to="/">
+            <Link href="/">
               <button className="btn-ghost" style={{ width: '100%' }}>
                 Back to all quizzes
               </button>

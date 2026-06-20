@@ -1,13 +1,14 @@
+'use client'
 import { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { QUIZZES, deriveFireType, deriveRiskProfile, FIRE_TYPE_META, RISK_META } from '../data/quizzes'
 import { useAuthStore } from '../stores/useAuthStore'
-import { supabase } from '../lib/supabase'
+import { supabase } from '../lib/supabase/client'
 
 export default function Quiz() {
   const { slug } = useParams()
-  const navigate = useNavigate()
+  const router = useRouter()
   const { user } = useAuthStore()
 
   const quiz = QUIZZES.find(q => q.slug === slug)
@@ -19,7 +20,7 @@ export default function Quiz() {
   useEffect(() => { setStep(0); setAnswers({}) }, [slug])
 
   if (!quiz) {
-    navigate('/')
+    router.push('/')
     return null
   }
 
@@ -58,6 +59,13 @@ export default function Quiz() {
       result = { risk_profile: profile, ...RISK_META[profile] }
     }
 
+    if (!user) {
+      localStorage.setItem(`vile_fire_result_${slug}`, JSON.stringify({ quiz_slug: slug, answers, result }))
+      setSaving(false)
+      router.push(`/results/${slug}`)
+      return
+    }
+
     if (user) {
       await supabase.from('fire_quiz_results').insert({
         user_id: user.id,
@@ -66,7 +74,6 @@ export default function Quiz() {
         result,
       })
 
-      // Auto-populate fire plan from fire_type quiz
       if (slug === 'fire_type' && result.fire_type) {
         await supabase.from('user_fire_plans').upsert({
           user_id: user.id,
@@ -77,10 +84,8 @@ export default function Quiz() {
         })
       }
 
-      // Points + badges
       await supabase.rpc('add_points', { p_points: 10, p_reason: 'quiz_completed' })
       await supabase.rpc('award_badge', { p_badge_slug: 'quiz_taker', p_context: { quiz_slug: slug } })
-      // Award fire_mapped if all 5 quizzes done
       const { data: allResults } = await supabase
         .from('fire_quiz_results')
         .select('quiz_slug')
@@ -91,7 +96,6 @@ export default function Quiz() {
         await supabase.rpc('add_points', { p_points: 40, p_reason: 'milestone' })
       }
 
-      // Activity feed
       await supabase.from('activity_feed').insert({
         user_id: user.id,
         actor_name: user.user_metadata?.full_name || user.email,
@@ -107,7 +111,7 @@ export default function Quiz() {
     }
 
     setSaving(false)
-    navigate(`/results/${slug}`, { state: { answers, result, quiz } })
+    router.push(`/results/${slug}`)
   }
 
   const advance = () => {
@@ -128,14 +132,14 @@ export default function Quiz() {
 
       {/* Header */}
       <div style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #1C2320' }}>
-        <button onClick={() => step > 0 ? setStep(s => s - 1) : navigate('/')}
+        <button onClick={() => step > 0 ? setStep(s => s - 1) : router.push('/')}
           style={{ fontFamily: 'monospace', fontSize: '0.7rem', color: '#8A9E96', background: 'none', border: 'none', cursor: 'pointer', letterSpacing: '0.1em' }}>
           ← {step === 0 ? 'back' : 'previous'}
         </button>
         <span style={{ fontFamily: 'monospace', fontSize: '0.65rem', color: '#4A6A5A', letterSpacing: '0.15em' }}>
           {step + 1} / {total}
         </span>
-        <button onClick={() => navigate('/')}
+        <button onClick={() => router.push('/')}
           style={{ fontFamily: 'monospace', fontSize: '0.65rem', letterSpacing: '0.1em', color: '#3a3028', background: 'none', border: 'none', cursor: 'pointer' }}>
           ✕ exit
         </button>
