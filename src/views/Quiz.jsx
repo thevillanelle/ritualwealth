@@ -59,6 +59,13 @@ export default function Quiz() {
       result = { risk_profile: profile, ...RISK_META[profile] }
     }
 
+    if (!user) {
+      localStorage.setItem(`vile_fire_result_${slug}`, JSON.stringify({ quiz_slug: slug, answers, result }))
+      setSaving(false)
+      router.push(`/results/${slug}`)
+      return
+    }
+
     if (user) {
       await supabase.from('fire_quiz_results').insert({
         user_id: user.id,

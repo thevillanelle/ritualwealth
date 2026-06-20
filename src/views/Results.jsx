@@ -38,7 +38,7 @@ function fmt(n) {
 export default function Results() {
   const { slug } = useParams()
   const router = useRouter()
-  const { user } = useAuthStore()
+  const { user, signInWithGoogle } = useAuthStore()
   const [result, setResult] = useState(null)
   const [loading, setLoading] = useState(true)
 
@@ -50,8 +50,8 @@ export default function Results() {
     if (!quiz) { router.push('/'); return }
     // Fetch the most recent result for this quiz from Supabase
     if (!user) {
-      // Not signed in — still show generic completion screen
-      setResult({})
+      const cached = localStorage.getItem(`vile_fire_result_${slug}`)
+      setResult(cached ? JSON.parse(cached).result : {})
       setLoading(false)
       return
     }
@@ -121,6 +121,23 @@ export default function Results() {
                 </p>
               </div>
             </>
+          )}
+
+          {/* Guest CTA */}
+          {!user && (
+            <div className="card" style={{ marginBottom: '1.5rem', background: 'rgba(200,168,107,0.08)', border: '1px solid rgba(200,168,107,0.3)' }}>
+              <p style={{ fontFamily: 'monospace', fontSize: '0.65rem', color: '#C8A86B', letterSpacing: '0.1em', marginBottom: '0.5rem' }}>SAVE YOUR RESULTS</p>
+              <p style={{ fontFamily: '"DM Sans", sans-serif', fontSize: '0.85rem', color: '#C8BFB0', lineHeight: 1.6, marginBottom: '1rem' }}>
+                Sign in to save your FIRE quiz results and build your complete plan.
+              </p>
+              <button
+                onClick={() => signInWithGoogle()}
+                className="btn-primary"
+                style={{ width: '100%' }}
+              >
+                Continue with Google ✦
+              </button>
+            </div>
           )}
 
           {/* Navigation */}
