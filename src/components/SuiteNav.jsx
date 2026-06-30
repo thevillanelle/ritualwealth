@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuthStore } from '../stores/useAuthStore'
 import NotificationBell from './NotificationBell'
+import { goToRobinProfile } from '../lib/supabase/robinHandoff'
 
 function getInitials(user) {
   const name = user?.user_metadata?.full_name || user?.user_metadata?.name
@@ -25,7 +26,6 @@ const NAV = [
   { to: '/',           label: 'Home' },
   { to: '/plan',       label: 'My Plan' },
   { to: '/tools/debt', label: 'Debt Payoff' },
-  { to: '/profile',    label: 'My Ritual Profile' },
 ]
 
 export default function SuiteNav() {
@@ -101,11 +101,15 @@ export default function SuiteNav() {
               <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid #1A1C16' }}>
                 <p style={{ fontFamily: 'monospace', fontSize: '0.5rem', letterSpacing: '0.15em', color: '#2A3530', marginBottom: '0.75rem' }}>THIS APP</p>
                 {NAV.map(item => (
-                  <Link key={item.to} to={item.to} onClick={() => setOpen(false)}
+                  <Link key={item.to} href={item.to} onClick={() => setOpen(false)}
                     style={{ display: 'block', padding: '0.6rem 0', fontFamily: '"DM Sans", sans-serif', fontSize: '0.85rem', color: '#8A9E96', textDecoration: 'none', borderBottom: '1px solid #12140F' }}>
                     {item.label}
                   </Link>
                 ))}
+                <button onClick={() => { goToRobinProfile(); setOpen(false) }}
+                  style={{ display: 'block', width: '100%', textAlign: 'left', padding: '0.6rem 0', fontFamily: '"DM Sans", sans-serif', fontSize: '0.85rem', color: '#8A9E96', background: 'none', border: 'none', borderBottom: '1px solid #12140F', cursor: 'pointer' }}>
+                  My Ritual Profile
+                </button>
               </div>
 
               {/* Suite links */}
